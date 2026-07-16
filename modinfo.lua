@@ -7,7 +7,7 @@ end
 name = en_zh("BBGOAT Utils", "冰冰羊的模组运行库")
 description = [[]]
 author = "冰冰羊"
-version = "2026-7-17-A"
+version = "2026-7-17-B"
 version_compatible = "2026-7-17"
 api_version_dst = 10
 priority = 2e53
@@ -33,6 +33,6 @@ icon = "modicon.tex"
 server_filter_tags = {
     "冰冰羊",
     "bbgoat_utils",
-    "bbgoat_utils" .. version
+    "bbgoat_utils " .. version
 }
 configuration_options = {}
