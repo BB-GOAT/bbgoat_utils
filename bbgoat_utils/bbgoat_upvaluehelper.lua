@@ -1,19 +1,5 @@
 -- 本文件更新时间：2026年6月24日
 
--- 加载此文件可使用下面的示例代码
---[[
-local function Import(modulename)
-    local f = GLOBAL.kleiloadlua(modulename)
-    if f and type(f) == "function" then
-        setfenv(f, GLOBAL)
-        return f()
-    end
-end
-
-Upvaluehelper = Import(MODROOT .. "scripts/utils/bbgoat_upvaluehelper.lua") or require("utils/bbgoat_upvaluehelper") -- 前者可以防止引用到其它模组的同名文件发生意外情况，后者可以使Vscode识别并显示函数提示。你可以二选一或者像我一样都写上
-]]
-
-
 -- 查看函数里有哪些上值，方便调试
 -- 调用示例
 --[[
