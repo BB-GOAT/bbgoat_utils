@@ -43,7 +43,7 @@ end
 
 -- 遍历搜索上值
 ---@param fn function 被搜索的函数
----@param name string 要搜索的上值名
+---@param name string|true 要搜索的上值名(如果为true，则依赖fn_filter筛选上值)
 ---@param fn_filter string|function|nil 限定搜索到的函数必须：来源于某个文件|符合过滤条件
 ---@param value_filter string|function|nil 限定找到的上值（如果是函数）必须：来源于某个文件|符合过滤条件
 ---@return any 找到的上值
@@ -63,12 +63,12 @@ local function FindUpvalue(fn, name, fn_filter, value_filter)
     while true do
         local upname, upvalue = debug.getupvalue(fn, i)
         if not upname then break end -- 全找完了，跳出
-        if upname and upname == name then
+        if upname and (upname == name or name == true) then
             if fn_filter then -- 限定条件 防止被别人提前hook导致取错
                 local fninfo = debug.getinfo(fn)
                 local valueinfo = type(upvalue) == "function" and debug.getinfo(upvalue)
 
-                if ((type(fn_filter) == "string" and fninfo.source and fninfo.source:match(fn_filter)) or (type(fn_filter) == "function" and fn_filter(upvalue))) -- 检查是否符合过滤条件
+                if ((type(fn_filter) == "string" and fninfo.source and fninfo.source:match(fn_filter)) or (type(fn_filter) == "function" and fn_filter(fn))) -- 检查是否符合过滤条件
                     and (not value_filter or (type(value_filter) == "string" and valueinfo and valueinfo.source:match(value_filter)) or (type(value_filter) == "function" and value_filter(upvalue)))
                 then
                     return TryToClose(level, upvalue, i, fn)
