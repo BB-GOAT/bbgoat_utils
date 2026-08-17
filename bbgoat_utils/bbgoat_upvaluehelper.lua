@@ -125,7 +125,7 @@ local function GetUpvalueHelper(fn, name)
     end
 
     local found_value, found_i, found_fn = FindUpvalue(fn, name)
-    if found_value ~= nil then
+    if found_fn ~= nil then
         return found_value, found_i, found_fn
     end
 
