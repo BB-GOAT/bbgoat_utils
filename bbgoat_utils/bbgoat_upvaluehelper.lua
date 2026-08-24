@@ -360,19 +360,19 @@ local function GetEventHandle(inst, event, file, test)
 end
 
 -- 补充一下风铃草大佬没写的关于世界监听函数,随便写的,感觉太菜就憋着别说 -- 咸鱼说的
-local function GetWorldHandle(inst, var, file)
-    if type(inst) == "table" then
-        local watchings = inst.worldstatewatching and inst.worldstatewatching[var] or nil
-        if watchings then
-            for _, fn in pairs(watchings) do
-                if FunctionTest(fn, file) then -- 寻找成功就返回
-                    return fn
-                end
-            end
-        end
-        -- 另一个获取的路径是 TheWorld.components.worldstate 不过没差了
-    end
-end
+-- local function GetWorldHandle(inst, var, file)
+--     if type(inst) == "table" then
+--         local watchings = inst.worldstatewatching and inst.worldstatewatching[var] or nil
+--         if watchings then
+--             for _, fn in pairs(watchings) do
+--                 if FunctionTest(fn, file) then -- 寻找成功就返回
+--                     return fn
+--                 end
+--             end
+--         end
+--         -- 另一个获取的路径是 TheWorld.components.worldstate 不过没差了
+--     end
+-- end
 
 return {
     LookUpvalue = LookUpvalue,
@@ -385,5 +385,5 @@ return {
     SetLocal = SetLocal,
     Getmoddata = Getmoddata,
     GetEventHandle = GetEventHandle,
-    GetWorldHandle = GetWorldHandle,
+    -- GetWorldHandle = GetWorldHandle, -- 真正需要用了再启用
 }
