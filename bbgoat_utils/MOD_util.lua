@@ -133,6 +133,15 @@ function MOD_util:AddUserCommand(command_string, params_table, client_command_fn
     AddUserCommand(command_data.name, command_data)
 end
 
+---@param fn function
+---@return string
+---@return integer
+function MOD_util:GetFnInfo(fn) -- 获取函数是在哪里定义的
+    if type(fn) ~= "function" then self:Warning("MOD_util:GetFnInfo 输入的参数不是函数，而是" .. type(fn), 3) return end
+    local info = debug.getinfo(fn, "S")
+    return info.source, info.linedefined
+end
+
 -- 检查模组信息..防人之心不可无，希望我永远用不到
 --[[
 function MOD_util:DoCrash()
