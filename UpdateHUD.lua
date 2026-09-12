@@ -99,21 +99,10 @@ local function RegisterHUD(self)
     end
 end
 
-local timerTask
-
-local onFindFrontEnd = function()
-    if timerTask ~= nil then
-        timerTask:Cancel()
-        timerTask = nil
-    end
-
-    RegisterHUD(_G.TheFrontEnd.overlayroot)
-end
-
 if not TheNet:IsDedicated() then
-    timerTask = _G.scheduler:ExecutePeriodic(1/2, function () -- 创建一个定时任务，每秒检查前端界面是否存在
-        if _G.TheFrontEnd ~= nil then
-            onFindFrontEnd()
+    AddGamePostInit(function()
+        if _G.TheFrontEnd and _G.TheFrontEnd.overlayroot then
+            RegisterHUD(_G.TheFrontEnd.overlayroot)
         end
     end)
 end

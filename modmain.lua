@@ -7,7 +7,7 @@ GLOBAL.setmetatable(env, {
 -- 创建虚拟模组信息
 local server_folder_name = string.find(modname, "workshop-") and "bbgoat-utils-server" or "bbgoat-utils-server-github"
 local modinfo_bbgoat_util = {
-    name = modinfo.name .. " - 服务器版", -- 名称
+    name = modinfo.server_modname, -- 名称
     description = modinfo.description, -- 介绍
     configuration_options = modinfo.configuration_options, -- 配置
     version = modinfo.version, -- 版本
