@@ -6,7 +6,7 @@ local allplayerfn_once = {}
 
 ---@param fn fun(world: TheWorld, player: ThePlayer): nil 
 ---@param onlyonce boolean|nil 本局游戏只运行一次？即使换人也不重新触发
-function MOD_util:AddPlayerPostInit(fn, onlyonce) -- 好处是不用官方的any接口，作为客机时其它玩家不会触发PlayerPostInit
+function MOD_util:AddPlayerPostInit(fn, onlyonce) -- 好处是不用官方的any接口，其它玩家不会触发PlayerPostInit
     if onlyonce then
         allplayerfn_once[fn] = true
     else
@@ -19,11 +19,11 @@ AddPrefabPostInit("world", function(world)
     world:ListenForEvent("playeractivated", function(self, data)
         if a then
             a = false
-            for fn, v in pairs(allplayerfn_once) do
+            for fn in pairs(allplayerfn_once) do
                 fn(self, data)
             end
         end
-        for fn, v in pairs(allplayerfn) do
+        for fn in pairs(allplayerfn) do
             fn(self, data)
         end
     end)
