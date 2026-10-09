@@ -1,4 +1,4 @@
--- 本文件更新时间：2026年8月8日
+-- 本文件更新时间：2026年10月9日
 
 -- 查看函数里有哪些上值，方便调试
 -- 调用示例
@@ -11,20 +11,25 @@
     Upvaluehelper.LookUpvalue(fn)
 ]]
 --- @param fn function 要被显示所有上值的函数
-local function LookUpvalue(fn)
+--- @param need_return boolean 要返回结果而不是打印信息吗
+local function LookUpvalue(fn, need_return)
     if type(fn) ~= "function" then print("LookUpvalue 错误：传入的参数不是函数，而是",type(fn)) return end
     local i = 1
     local _value
     local _name = ''
+    local upvalues = {}
+    local print = function(...) if not need_return then print(...) end end
 
     print("--------------LookUpvalue 开始--------------")
     while true do
         _name, _value = debug.getupvalue(fn, i)
         if not _name then break end
         print(i, _name, _value) -- 将找到的信息打印出来
+        upvalues[i] = {name = _name, value = _value}
         i = i + 1
     end
     print("--------------LookUpvalue 结束--------------")
+    return need_return and upvalues
 end
 
 local visit = {} -- 保存已经访问的 防止有嵌套
@@ -81,18 +86,16 @@ local function FindUpvalue(fn, name, fn_filter, value_filter)
                     end
                 end
             elseif value_filter then -- 仅限定获取到的上值符合过滤条件
-                if type(upvalue) == "function" then
-                    local valueinfo = debug.getinfo(upvalue)
+                local valueinfo = type(upvalue) == "function" and debug.getinfo(upvalue)
 
-                    if (type(value_filter) == "string" and valueinfo and valueinfo.source:match(value_filter))
-                        or (type(value_filter) == "function" and value_filter(upvalue))
-                    then
-                        return TryToClose(level, upvalue, i ,fn)
-                    else -- 来源错误，递归查找
-                        local upupvalue, upupi, upupfn = FindUpvalue(upvalue, name, fn_filter, value_filter)
-                        if upupfn ~= nil then
-                            return TryToClose(level, upupvalue, upupi, upupfn)
-                        end
+                if (type(value_filter) == "string" and valueinfo and valueinfo.source:match(value_filter))
+                    or (type(value_filter) == "function" and value_filter(upvalue))
+                then
+                    return TryToClose(level, upvalue, i ,fn)
+                else -- 来源错误，递归查找
+                    local upupvalue, upupi, upupfn = FindUpvalue(upvalue, name, fn_filter, value_filter)
+                    if upupfn ~= nil then
+                        return TryToClose(level, upupvalue, upupi, upupfn)
                     end
                 end
             else -- 未限定文件，直接返回
@@ -180,7 +183,7 @@ local function SetUpvalue(start_fn, new_fn, ...)
     debug.setupvalue(scope_fn, _fn_i, new_fn)
 end
 
--- 隐藏被HOOK过的函数，使其不影响其它模组getupvalue
+-- 隐藏被HOOK过的函数，使其不影响其它模组getupvalue、getinfo等对函数的识别与上值操作
 -- 调用示例
 --[[
     local PlayerHud = require("screens/playerhud")
@@ -195,25 +198,84 @@ end
 local hidden_fns = rawget(_G, "UpvalueHackerHiddenFns")
 if not hidden_fns then
     hidden_fns = {}
-    _G.UpvalueHackerHiddenFns = hidden_fns -- 将hidden_fns映射到全局变量UpvalueHackerHiddenFns使其它模组也能访问到它
+    rawset(_G, "UpvalueHackerHiddenFns", hidden_fns) -- 将hidden_fns映射到全局变量UpvalueHackerHiddenFns使其它模组也能访问到它
+
+    local function ResolveFn(fn)
+        if type(fn) == "function" then
+            for _ = 1, 64 do
+                local target = hidden_fns[fn]
+                if not target then break end
+                fn = target
+            end
+        end
+        return fn
+    end
 
     local _debug_getupvalue = debug.getupvalue
     local _debug_setupvalue = debug.setupvalue
     local _debug_getfenv = debug.getfenv
     local _debug_setfenv = debug.setfenv
+    local _debug_getinfo = debug.getinfo
 
-    function debug.getupvalue(fn, ...) return _debug_getupvalue(hidden_fns[fn] or fn, ...) end
-    function debug.setupvalue(fn, ...) return _debug_setupvalue(hidden_fns[fn] or fn, ...) end
-    function debug.getfenv(fn, ...) return _debug_getfenv(hidden_fns[fn] or fn, ...) end
-    function debug.setfenv(fn, ...) return _debug_setfenv(hidden_fns[fn] or fn, ...) end
+    local function getupvalue_resolve(fn, ...)
+        return _debug_getupvalue(ResolveFn(fn), ...)
+    end
+    local function setupvalue_resolve(fn, ...)
+        return _debug_setupvalue(ResolveFn(fn), ...)
+    end
+    local function getfenv_resolve(o, ...)
+        if type(o) == "number" then
+            return _debug_getfenv(o + 1) -- 补偿自身占用的栈帧
+        end
+        return _debug_getfenv(ResolveFn(o), ...)
+    end
+    local function setfenv_resolve(o, ...)
+        if type(o) == "number" then
+            return _debug_setfenv(o + 1, ...) -- 补偿自身占用的栈帧
+        end
+        return _debug_setfenv(ResolveFn(o), ...)
+    end
 
-    hidden_fns[debug.getupvalue] = _debug_getupvalue
-    hidden_fns[debug.setupvalue] = _debug_setupvalue
-    hidden_fns[debug.getfenv] = _debug_getfenv
-    hidden_fns[debug.setfenv] = _debug_setfenv
+    local function getinfo_resolve(a, b, c)
+        if type(a) == "function" then
+            return _debug_getinfo(ResolveFn(a), b)
+        elseif type(a) == "number" then
+            return _debug_getinfo(a + 1, b) -- 补偿自身占用的栈帧，数字层级和线程形式不能被破坏栈回溯
+        elseif type(a) == "thread" and type(b) == "function" then
+            return _debug_getinfo(a, ResolveFn(b), c) -- thread形式的函数参数
+        end
+        return _debug_getinfo(a, b, c) -- thread+层级：层级属于目标线程自己的栈，不受本wrapper栈帧影响，无需补偿
+    end
+    debug.getupvalue = getupvalue_resolve
+    debug.setupvalue = setupvalue_resolve
+    debug.getfenv = getfenv_resolve
+    debug.setfenv = setfenv_resolve
+    debug.getinfo = getinfo_resolve
+
+    -- string.dump 默认连同调试信息（来源文件名、行号、上值名）一起导出字节码，同样能暴露函数的真实来源...
+    -- local _string_dump = string.dump
+    -- local function string_dump_resolve(fn, ...)
+    --     return _string_dump(ResolveFn(fn), ...)
+    -- end
+    -- string.dump = string_dump_resolve
+
+    hidden_fns[getupvalue_resolve] = _debug_getupvalue
+    hidden_fns[setupvalue_resolve] = _debug_setupvalue
+    hidden_fns[getfenv_resolve] = _debug_getfenv
+    hidden_fns[setfenv_resolve] = _debug_setfenv
+    hidden_fns[getinfo_resolve] = _debug_getinfo
+    -- hidden_fns[string_dump_resolve] = _string_dump
 end
 
 local function HideFn(hidden_fn, real_fn)
+    if type(hidden_fn) ~= "function" or type(real_fn) ~= "function" then
+        print("Upvaluehelper.HideFn 警告：两个参数都应为函数，实际为", type(hidden_fn), type(real_fn))
+        local info = debug.getinfo(2)
+        local filename, line = info.source or "???", info.currentline or "???"
+        print("本函数调用于" .. tostring(filename) .. ":" .. tostring(line))
+        return
+    end
+
     hidden_fns[hidden_fn] = real_fn
 end
 
