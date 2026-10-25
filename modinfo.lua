@@ -8,14 +8,14 @@ name = en_zh("BBGOAT Utils", "冰冰羊的模组运行库")
 server_modname = name .. en_zh(" - Server", " - 服务器版")
 description = [[]]
 author = "冰冰羊"
-version = "2026-10-09"
+version = "2026-10-25"
 version_compatible = "2026-10-02"
 api_version_dst = 10
 priority = 2e53
 
 if not folder_name:find("workshop-") then
     name = name .. en_zh(" - GitHub Ver", " - GitHub 版")
-    priority = 2e54
+    priority = (2^53 - 1) * 2^971
 end
 
 dst_compatible = true -- 兼容联机版

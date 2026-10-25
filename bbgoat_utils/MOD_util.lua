@@ -90,7 +90,12 @@ function MOD_util:RegisterOtherModAssets(modname, assets) -- 加载指定模组�
         return
     end
     table.insert(RegisterModAssetsFns, function()
-        local pref = _G.Prefab("MOD_"..modname, nil, assets, {}, true)
+        -- RegisterSinglePrefab 会改写 asset.file 每次注册都使用新的 Asset 对象
+        local prefab_assets = {}
+        for i, asset in ipairs(assets) do
+            prefab_assets[i] = _G.Asset(asset.type, asset.file, asset.param)
+        end
+        local pref = _G.Prefab("MOD_"..modname, nil, prefab_assets, {}, true)
         pref.search_asset_first_path = _G.MODS_ROOT .. modname.. "/"
         _G.RegisterSinglePrefab(pref)
 
