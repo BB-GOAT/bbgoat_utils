@@ -159,10 +159,10 @@ local old_FrontendLoadMod = ModManager.FrontendLoadMod
 ModManager.FrontendLoadMod = function(self, modname, ...)
 	old_FrontendLoadMod(self, modname, ...)
 	if modname == "workshop-2657513551" then -- 独行长路
-		if rawget(GLOBAL, "TheFrontEnd") ~= nil then
+		if rawget(_G, "TheFrontEnd") ~= nil then
 			-- 延迟0.1秒，等待ServerCreationScreen和独行长路加载完毕
 			scheduler:ExecuteInTime(0.1, function()
-				for _, screen in ipairs(GLOBAL.TheFrontEnd.screenstack) do
+				for _, screen in ipairs(_G.TheFrontEnd.screenstack) do
 					if screen.name == "ServerCreationScreen" then
 						if not screen.bbgoat_util_compatibility_dsa_hooked_flag then
 							HookServerCreationScreen(screen) -- 重新HOOK 点击“回到世界”时的操作
@@ -193,7 +193,7 @@ local function ChangeModname()
                         else
                             print(string.format("看起来 存档%s 世界%s 不是一个有效的shardIndex...？", slot, shardName))
                         end
-                    elseif shardIndex.enabled_mods and moddata.modinfo.force_enabled_server_mod then
+                    elseif shardIndex.enabled_mods and moddata.modinfo.force_enabled_server_mod and not shardIndex.enabled_mods[moddata.modinfo.folder_name]then
                         print(string.format("看起来 存档%s(%s) 世界%s 没有开启 %s ，强制开启 %s 以供下次使用", slot, shardIndex.server and shardIndex.server.name or "未知存档名称", shardName, moddata.modinfo.name, moddata.modinfo.folder_name))
                         if shardIndex:IsValid() then
                             shardIndex.enabled_mods[moddata.modinfo.folder_name] = {

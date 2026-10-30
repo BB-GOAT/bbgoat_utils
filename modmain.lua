@@ -5,7 +5,7 @@ GLOBAL.setmetatable(env, {
 })
 
 -- 创建虚拟模组信息
-local server_folder_name = string.find(modname, "workshop-") and "bbgoat-utils-server" or "bbgoat-utils-server-github"
+local server_folder_name = string.find(modname, "workshop%-") and "bbgoat-utils-server" or "bbgoat-utils-server-github"
 local modinfo_bbgoat_util = {
     name = modinfo.server_modname, -- 名称
     description = modinfo.description, -- 介绍

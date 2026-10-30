@@ -8,12 +8,12 @@ name = en_zh("BBGOAT Utils", "冰冰羊的模组运行库")
 server_modname = name .. en_zh(" - Server", " - 服务器版")
 description = [[]]
 author = "冰冰羊"
-version = "2026-10-25"
+version = "2026-10-30"
 version_compatible = "2026-10-02"
 api_version_dst = 10
-priority = 2e53
+priority = 2e54 -- 高于Luajit以便被它调用
 
-if not folder_name:find("workshop-") then
+if not folder_name:find("workshop%-") then
     name = name .. en_zh(" - GitHub Ver", " - GitHub 版")
     priority = (2^53 - 1) * 2^971
 end
@@ -26,7 +26,8 @@ dont_starve_compatible = false -- 不兼容单机版
 server_only_mod = false
 client_only_mod = true
 all_clients_require_mod = true
--- 补充说明：上面2个都是true是故意的，不会导致游戏出现任何问题。再拿这个说我直接开喷
+-- 补充说明：上面2个都是true是故意的，不会导致游戏出现任何问题
+-- 目的是将此模组插入到服务器模组后 其它玩家加入服务器时自动下载本模组并启用
 
 icon_atlas = "images/modicon.xml"
 icon = "modicon.tex"
