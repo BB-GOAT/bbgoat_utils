@@ -1,4 +1,4 @@
--- 本文件更新时间：2026年10月9日
+-- 本文件更新时间：2026年11月5日
 
 -- 查看函数里有哪些上值，方便调试
 -- 调用示例
@@ -236,15 +236,27 @@ if not hidden_fns then
         return _debug_setfenv(ResolveFn(o), ...)
     end
 
+    local _coroutine_running = coroutine.running
     local function getinfo_resolve(a, b, c)
         if type(a) == "function" then
             return _debug_getinfo(ResolveFn(a), b)
         elseif type(a) == "number" then
-            return _debug_getinfo(a + 1, b) -- 补偿自身占用的栈帧，数字层级和线程形式不能被破坏栈回溯
-        elseif type(a) == "thread" and type(b) == "function" then
-            return _debug_getinfo(a, ResolveFn(b), c) -- thread形式的函数参数
+            -- 第 0 层是 getinfo 自身；仅为调用者层级补偿包装帧。
+            if a >= 1 then a = a + 1 end
+            -- 保留包装帧，避免 LuaJIT 热编译后尾调用使层级补偿失效。
+            local info = _debug_getinfo(a, b)
+            return info
+        elseif type(a) == "thread" then
+            if type(b) == "function" then
+                return _debug_getinfo(a, ResolveFn(b), c)
+            elseif type(b) == "number" and a == _coroutine_running() then
+                -- 当前协程正在执行本包装函数，也需要补偿；其它线程不需要。
+                if b >= 1 then b = b + 1 end
+                local info = _debug_getinfo(a, b, c)
+                return info
+            end
         end
-        return _debug_getinfo(a, b, c) -- thread+层级：层级属于目标线程自己的栈，不受本wrapper栈帧影响，无需补偿
+        return _debug_getinfo(a, b, c)
     end
     debug.getupvalue = getupvalue_resolve
     debug.setupvalue = setupvalue_resolve
