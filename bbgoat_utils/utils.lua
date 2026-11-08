@@ -19,4 +19,5 @@ PersistentData = require_util("persistentdata.lua", GLOBAL)
 Upvaluehelper = require_util("bbgoat_upvaluehelper.lua", GLOBAL)
 MOD_util = require_util("MOD_util.lua")
 BBGOAT_util = require_util("BBGOAT_util.lua")
+Toast = require_util("Toast.lua")
 require_util("AddClientModToServerModList.lua") -- 需要在MOD_util后面加载

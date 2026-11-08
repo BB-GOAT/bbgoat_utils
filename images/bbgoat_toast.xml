@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Atlas>
+  <Texture filename="bbgoat_toast.tex" />
+  <Elements>
+    <Element name="info_top_left.tex" u1="0.0078125" u2="0.046875" v1="0.8125" v2="0.96875" />
+    <Element name="info_top_center.tex" u1="0.046875" u2="0.1875" v1="0.8125" v2="0.96875" />
+    <Element name="info_top_right.tex" u1="0.1875" u2="0.2265625" v1="0.8125" v2="0.96875" />
+    <Element name="info_mid_left.tex" u1="0.0078125" u2="0.046875" v1="0.625" v2="0.8125" />
+    <Element name="info_mid_center.tex" u1="0.046875" u2="0.1875" v1="0.625" v2="0.8125" />
+    <Element name="info_mid_right.tex" u1="0.1875" u2="0.2265625" v1="0.625" v2="0.8125" />
+    <Element name="info_bottom_left.tex" u1="0.0078125" u2="0.046875" v1="0.46875" v2="0.625" />
+    <Element name="info_bottom_center.tex" u1="0.046875" u2="0.1875" v1="0.46875" v2="0.625" />
+    <Element name="info_bottom_right.tex" u1="0.1875" u2="0.2265625" v1="0.46875" v2="0.625" />
+    <Element name="error_top_left.tex" u1="0.2421875" u2="0.3203125" v1="0.65625" v2="0.96875" />
+    <Element name="error_top_center.tex" u1="0.3203125" u2="0.4609375" v1="0.65625" v2="0.96875" />
+    <Element name="error_top_right.tex" u1="0.4609375" u2="0.5390625" v1="0.65625" v2="0.96875" />
+    <Element name="error_mid_left.tex" u1="0.2421875" u2="0.3203125" v1="0.46875" v2="0.65625" />
+    <Element name="error_mid_center.tex" u1="0.3203125" u2="0.4609375" v1="0.46875" v2="0.65625" />
+    <Element name="error_mid_right.tex" u1="0.4609375" u2="0.5390625" v1="0.46875" v2="0.65625" />
+    <Element name="error_bottom_left.tex" u1="0.2421875" u2="0.3203125" v1="0.15625" v2="0.46875" />
+    <Element name="error_bottom_center.tex" u1="0.3203125" u2="0.4609375" v1="0.15625" v2="0.46875" />
+    <Element name="error_bottom_right.tex" u1="0.4609375" u2="0.5390625" v1="0.15625" v2="0.46875" />
+  </Elements>
+</Atlas>
