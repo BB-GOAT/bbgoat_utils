@@ -10,6 +10,14 @@ local Widget = require "widgets/widget"
 local Image = require "widgets/image"
 local Text = require "widgets/text"
 
+local TOAST_FONT = "bbgoat_toast_font"
+local TOAST_FONT_FILE = MODROOT .. "fonts/" .. TOAST_FONT .. ".zip"
+table.insert(_G.FONTS, {
+    filename = TOAST_FONT_FILE,
+    alias = TOAST_FONT,
+    fallback = _G.DEFAULT_FALLBACK_TABLE,
+})
+
 local TOAST_ATLAS = "images/bbgoat_toast.xml"
 Assets = Assets or {}
 table.insert(Assets, Asset("ATLAS", TOAST_ATLAS))
@@ -106,8 +114,8 @@ function ToastLayer:ShowToast(text, second, toast_type, colour, font)
     local message = self:AddChild(Widget("BBGOAT_Toast"))
     message:SetClickable(false)
 
-    -- 原版：DEFAULTFONT，开启高清字体：使用无描边字体
-    font = font or (_G.CHATFONT == "cnfont" and _G.CHATFONT or _G.DEFAULTFONT)
+    -- 默认使用提示专用无描边字体，仍可通过第五参数指定其它字体
+    font = font or TOAST_FONT
 
     -- 保留显式换行，按实际文字尺寸布局
     -- 将语言缩放后的实际字号向上取整
@@ -115,6 +123,10 @@ function ToastLayer:ShowToast(text, second, toast_type, colour, font)
     local font_size = math.ceil(FONT_SIZE * text_scale) / text_scale
     local label = message:AddChild(Text(font, font_size, text, { 1, 1, 1, 1 }))
     label:SetHAlign(ANCHOR_LEFT)
+    -- 专用字库补偿半像素采样偏移，避免停稳后笔画被插值模糊
+    if font == TOAST_FONT then
+        label:SetPosition(0.5, 0.5)
+    end
     label:SetClickable(false)
     local width, height = label:GetRegionSize()
     message.width = math.max(width, 1) + PADDING_X * 2
