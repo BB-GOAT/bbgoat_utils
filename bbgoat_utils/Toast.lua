@@ -144,6 +144,8 @@ function ToastLayer:ShowToast(text, second, toast_type, colour, font)
 end
 
 function ToastLayer:OnUpdate(dt)
+    dt = math.min(dt, 1 / 30) -- 避免卡顿造成一次推进过多，跳过入场或退场动画
+
     local animated = false
     local removed = false
 
