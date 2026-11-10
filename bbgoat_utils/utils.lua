@@ -16,7 +16,7 @@ local function require_util(file_name, file_env)
 end
 
 PersistentData = require_util("persistentdata.lua", GLOBAL)
-Upvaluehelper = require_util("bbgoat_upvaluehelper.lua", GLOBAL)
+Upvaluehelper = require_util("bbgoat_upvaluehelper.lua")
 MOD_util = require_util("MOD_util.lua")
 BBGOAT_util = require_util("BBGOAT_util.lua")
 Toast = require_util("Toast.lua")

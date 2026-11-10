@@ -1,4 +1,7 @@
--- 本文件更新时间：2026年11月5日
+-- 本文件更新时间：2026年11月11日
+-- 此文件需要在模组环境运行，并且设置了自动查全局环境，并在modinfo设置luajit_compatible，以便获取jit实际状态
+local jit = jit
+setfenv(1, _G)
 
 -- 查看函数里有哪些上值，方便调试
 -- 调用示例
@@ -241,22 +244,22 @@ if not hidden_fns then
         if type(a) == "function" then
             return _debug_getinfo(ResolveFn(a), b)
         elseif type(a) == "number" then
-            -- 第 0 层是 getinfo 自身；仅为调用者层级补偿包装帧。
+            -- 第 0 层是 getinfo 自身；仅为调用者层级补偿包装帧
             if a >= 1 then a = a + 1 end
-            -- 保留包装帧，避免 LuaJIT 热编译后尾调用使层级补偿失效。
-            local info = _debug_getinfo(a, b)
-            return info
+            return _debug_getinfo(a, b)
         elseif type(a) == "thread" then
             if type(b) == "function" then
                 return _debug_getinfo(a, ResolveFn(b), c)
             elseif type(b) == "number" and a == _coroutine_running() then
-                -- 当前协程正在执行本包装函数，也需要补偿；其它线程不需要。
+                -- 当前协程正在执行本包装函数，也需要补偿；其它线程不需要
                 if b >= 1 then b = b + 1 end
-                local info = _debug_getinfo(a, b, c)
-                return info
+                return _debug_getinfo(a, b, c)
             end
         end
         return _debug_getinfo(a, b, c)
+    end
+    if jit and jit.off then -- luajit对堆栈层级不做保证，禁止其处理此部分
+        jit.off(getinfo_resolve)
     end
     debug.getupvalue = getupvalue_resolve
     debug.setupvalue = setupvalue_resolve

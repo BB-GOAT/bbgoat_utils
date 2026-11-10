@@ -8,7 +8,7 @@ name = en_zh("BBGOAT Utils", "冰冰羊的模组运行库")
 server_modname = name .. en_zh(" - Server", " - 服务器版")
 description = [[]]
 author = "冰冰羊"
-version = "2026-11-09-A"
+version = "2026-11-11"
 version_compatible = "2026-10-02"
 api_version_dst = 10
 priority = 2e54 -- 高于Luajit以便被它调用
@@ -17,6 +17,10 @@ if not folder_name:find("workshop%-") then
     name = name .. en_zh(" - GitHub Ver", " - GitHub 版")
     priority = (2^53 - 1) * 2^971
 end
+
+luajit_compatible = { -- Luajit兼容性标识 https://steamcommunity.com/sharedfiles/filedetails/?id=3444078585 | https://github.com/fesily/DontStarveLuaJIT2
+    dep_tailcall = false -- 表示不依赖堆栈深度
+}
 
 dst_compatible = true -- 兼容联机版
 forge_compatible = true -- 兼容熔炉
