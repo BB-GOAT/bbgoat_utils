@@ -52,7 +52,6 @@ if GLOBAL.rawget(GLOBAL, "BBGOAT_utils") then -- 开启了其它版本的运行�
 end
 
 modimport("bbgoat_utils/utils") -- 加载工具
-modimport("bbgoat_utils/UpdateHUD") -- 屏幕右下角提示HUD
 
 GLOBAL.BBGOAT_utils = {
     env = env,
